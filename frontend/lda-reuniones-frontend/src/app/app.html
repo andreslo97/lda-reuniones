@@ -1,0 +1,48 @@
+<div class="container my-4 am-container">
+  <div class="am-card">
+
+    <!-- Header con marca -->
+    <div class="am-card-header">
+      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <img
+            src="/assets/brand/almamater-logo.png"
+            alt="Hospital AlmaMáter"
+            style="height: 42px; width: auto;"
+          />
+
+          <div>
+            <h4 class="mb-0 am-title">Lista de Asistencia y Despliegue</h4>
+            <div class="am-subtitle">Crear y consultar reuniones</div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-pills am-pills">
+          <li class="nav-item">
+            <a class="nav-link"
+               routerLink="/reuniones/crear"
+               routerLinkActive="active"
+               [routerLinkActiveOptions]="{ exact: true }">
+              Crear reunión
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link"
+               routerLink="/reuniones/consulta"
+               routerLinkActive="active"
+               [routerLinkActiveOptions]="{ exact: true }">
+              Consultar reunión
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="am-card-body">
+      <router-outlet></router-outlet>
+    </div>
+
+  </div>
+</div>

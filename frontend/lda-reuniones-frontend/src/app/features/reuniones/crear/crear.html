@@ -1,0 +1,266 @@
+<div class="container my-4 am-container">
+  <div class="am-card">
+    <div class="am-card-header">
+
+      <div class="alert alert-light mb-3" style="font-size: 0.9rem; color: #3a7bd5;">
+        Le informamos que el Hospital Alma Máter de Antioquia obtiene sus datos de
+        conformidad con las políticas de tratamiento y protección de datos personales,
+        las cuales se encuentran acorde con la Ley 1581 de 2012 y el Decreto 1377 de 2013
+        y pueden ser consultadas en nuestro sitio web:
+        <a
+          href="https://www.almamater.hospital"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="fw-semibold"
+        >
+          www.almamater.hospital
+        </a>
+      </div>
+
+      <h3 class="am-title">Crear reunión</h3>
+      <p class="am-subtitle">Todos los campos son obligatorios.</p>
+    </div>
+
+    <div class="am-card-body">
+
+      <div *ngIf="errorMsg()" class="alert alert-am mb-4">
+        {{ errorMsg() }}
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+
+        <!-- Tipo documento -->
+        <div class="mb-3">
+          <label class="form-label">Tipo de documento</label>
+          <div class="d-flex gap-3">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="td_asistencia" value="ASISTENCIA" formControlName="tipo_documento" />
+              <label class="form-check-label" for="td_asistencia">Asistencia (FR-TH-2938 V08)</label>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="td_despliegue" value="DESPLIEGUE" formControlName="tipo_documento" />
+              <label class="form-check-label" for="td_despliegue">Despliegue (FR-MJ-2868 V06)</label>
+            </div>
+          </div>
+
+          <div class="text-danger small" *ngIf="form.get('tipo_documento')?.touched && form.get('tipo_documento')?.invalid">
+            Selecciona un tipo de documento.
+          </div>
+        </div>
+
+        <!-- Nombre -->
+        <div class="mb-3">
+          <label class="form-label">{{ nombreLabel() }}</label>
+
+          <textarea
+            class="form-control"
+            formControlName="nombre_evento"
+            placeholder="Escribe aquí"
+            rows="3"
+            style="resize: both;"
+          ></textarea>
+
+          <div
+            class="text-danger small"
+            *ngIf="form.get('nombre_evento')?.touched && form.get('nombre_evento')?.invalid"
+          >
+            Ingresa un valor válido.
+          </div>
+        </div>
+
+        <!-- Fecha y horarios -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-4">
+            <label class="form-label">Fecha</label>
+            <input class="form-control" type="date" formControlName="fecha_evento" [attr.min]="minDate"
+              (keydown)="$event.preventDefault()" (paste)="$event.preventDefault()" />
+            <div class="text-danger small" *ngIf="form.get('fecha_evento')?.touched && form.get('fecha_evento')?.invalid">
+              Selecciona una fecha válida.
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Hora inicio</label>
+            <input class="form-control" type="time" step="60" formControlName="hora_inicio" />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Hora fin</label>
+            <input class="form-control" type="time" step="60" formControlName="hora_fin" />
+          </div>
+
+          <div class="col-12">
+            <div class="form-text">Usa formato 24 horas (incluye madrugada).</div>
+          </div>
+
+          <div class="col-12">
+            <div class="text-danger small" *ngIf="form.touched && form.errors?.['rango_horas_invalido']">
+              La hora fin debe ser mayor que la hora inicio.
+            </div>
+          </div>
+        </div>
+
+        <!-- Modalidad / Sede -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Modalidad</label>
+            <select class="form-select" formControlName="modalidad">
+              <option value="">Selecciona...</option>
+              <option *ngFor="let m of modalidades()" [value]="m.codigo">{{ m.nombre }}</option>
+            </select>
+
+            <div class="text-danger small" *ngIf="form.get('modalidad')?.touched && form.get('modalidad')?.invalid">
+              Selecciona una modalidad.
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Ubicación (Sede)</label>
+            <select class="form-select" formControlName="sede" [disabled]="!form.get('modalidad')?.value">
+              <option value="">
+                {{ form.get('modalidad')?.value ? 'Selecciona...' : 'Primero selecciona modalidad' }}
+              </option>
+              <option *ngFor="let s of sedes()" [value]="s.codigo">{{ s.nombre_mostrado }}</option>
+            </select>
+
+            <div class="text-danger small reminder" *ngIf="form.get('sede')?.touched && form.get('sede')?.invalid">
+              Selecciona una sede.
+            </div>
+          </div>
+        </div>
+
+        <!-- Lugar -->
+        <div class="mb-3">
+          <label class="form-label">Lugar de la reunión</label>
+          <input class="form-control" type="text" formControlName="lugar_texto" placeholder="Ej: Sala 3 - Piso 2" />
+          <div class="text-danger small" *ngIf="form.get('lugar_texto')?.touched && form.get('lugar_texto')?.invalid">
+            Ingresa un lugar válido.
+          </div>
+        </div>
+
+        <hr class="my-4"/>
+
+        <!-- Anfitrión -->
+        <h5 class="mb-3" style="color: var(--am-navy); font-weight: 800;">Datos del anfitrión</h5>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Nombre completo</label>
+            <input class="form-control" type="text" formControlName="anfitrion_nombre" placeholder="Solo letras"
+              autocomplete="off" (keypress)="soloLetras($event)" />
+            <div class="text-danger small" *ngIf="form.get('anfitrion_nombre')?.touched && form.get('anfitrion_nombre')?.invalid">
+              El nombre solo puede contener letras y espacios.
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Identificación</label>
+            <input class="form-control" type="text" formControlName="anfitrion_identificacion"
+              placeholder="Solo números, mínimo 6 dígitos" autocomplete="off" inputmode="numeric" (keypress)="soloNumeros($event)" />
+            <div class="text-danger small" *ngIf="form.get('anfitrion_identificacion')?.touched && form.get('anfitrion_identificacion')?.invalid">
+              La identificación debe contener solo números (mínimo 6 dígitos).
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Correo</label>
+            <div class="input-group">
+              <input class="form-control" formControlName="anfitrion_correo_local" placeholder="nombre.apellido"
+                autocomplete="off" spellcheck="false" />
+              <span class="input-group-text">@almamater.hospital</span>
+            </div>
+            <div class="text-danger small" *ngIf="form.get('anfitrion_correo_local')?.touched && form.get('anfitrion_correo_local')?.invalid">
+              Ingresa solo la parte antes del @ (sin espacios).
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Cargo</label>
+            <input class="form-control" type="text" formControlName="anfitrion_cargo" />
+            <div class="text-danger small" *ngIf="form.get('anfitrion_cargo')?.touched && form.get('anfitrion_cargo')?.invalid">
+              Ingresa un cargo válido.
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4"/>
+
+        <!-- Proceso / Subproceso / Línea -->
+        <h5 class="mb-3" style="color: var(--am-navy); font-weight: 800;">Proceso al que pertenece</h5>
+
+        <div class="row g-3 mb-2">
+          <div class="col-md-4">
+            <label class="form-label">Proceso</label>
+            <select class="form-select" formControlName="proceso_id">
+              <option [ngValue]="null">Selecciona...</option>
+              <option *ngFor="let p of procesos()" [ngValue]="p.id">
+                {{ p.nombre_mostrado }}
+              </option>
+            </select>
+            <div class="text-danger small" *ngIf="form.get('proceso')?.touched && form.get('proceso')?.invalid">
+              Selecciona un proceso.
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Subproceso</label>
+            <select class="form-select" formControlName="subproceso_id" [disabled]="subprocesos().length === 0">
+              <option [ngValue]="null">
+                {{
+                  !form.get('proceso_id')?.value
+                    ? 'Primero selecciona proceso'
+                    : (subprocesos().length === 0 ? 'No aplica' : 'Selecciona...')
+                }}
+              </option>
+              <option *ngFor="let sp of subprocesos()" [ngValue]="sp.id">
+                {{ sp.nombre_mostrado }}
+              </option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Línea de trabajo</label>
+            <select class="form-select" formControlName="linea_trabajo_id" [disabled]="lineasTrabajo().length === 0">
+              <option [ngValue]="null">
+                {{
+                  !form.get('subproceso_id')?.value
+                    ? 'Primero selecciona subproceso'
+                    : (lineasTrabajo().length === 0 ? 'No aplica' : 'Selecciona...')
+                }}
+              </option>
+              <option *ngFor="let lt of lineasTrabajo()" [ngValue]="lt.id">
+                {{ lt.nombre_mostrado }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-text mb-3">
+          Selecciona el proceso. El subproceso y la línea de trabajo se habilitan automáticamente según corresponda.
+        </div>
+
+        <div
+          *ngIf="tipoDocumentoSel() === 'DESPLIEGUE'"
+          class="mt-2 small fst-italic text-dark"
+        >
+          Al continuar con el registro de información, certifico que conozco y comprendo el/los documento/s
+          mencionado/s y me comprometo a aplicarlo/s.
+        </div>
+
+        <div class="d-flex justify-content-end mt-4 gap-2">
+          <button class="btn btn-am-outline" type="button" routerLink="/reuniones">
+            Cancelar
+          </button>
+
+          <button class="btn btn-am-primary" type="submit" [disabled]="loading() || form.invalid">
+            {{ loading() ? 'Creando...' : 'Crear reunión' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+
+

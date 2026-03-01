@@ -1,0 +1,27 @@
+.titulo-seccion {
+  color: #0b3c5d;   // azul institucional
+  font-weight: 800;
+}
+
+.btn-accion {
+  border-radius: 12px;
+  padding: 10px 22px;
+  font-weight: 600;
+  border-width: 2px;
+  color: #1f3a5f;
+  border-color: #1f3a5f;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: #0b3c5d;
+    color: #ffffff;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #ffffff;
+    color: #6c757d;
+    border-color: #adb5bd;
+  }
+}

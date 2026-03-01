@@ -1,0 +1,190 @@
+<div class="container my-4" style="max-width: 980px;">
+
+  <div class="alert alert-light mb-3" style="font-size: 0.9rem; color: #3a7bd5;">
+        Le informamos que el Hospital Alma Máter de Antioquia obtiene sus datos de
+        conformidad con las políticas de tratamiento y protección de datos personales,
+        las cuales se encuentran acorde con la Ley 1581 de 2012 y el Decreto 1377 de 2013
+        y pueden ser consultadas en nuestro sitio web:
+        <a
+          href="https://www.almamater.hospital"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="fw-semibold"
+        >
+          www.almamater.hospital
+        </a>
+      </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-4">
+      <!-- ✅ Header siempre -->
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+        <div>
+          <h3 class="mb-3 titulo-seccion">Registro de asistentes</h3>
+
+          <!-- ✅ Nombre reunión -->
+          <div class="mb-2">
+            <div class="text-muted">Reunión:</div>
+            <div style="font-weight:800; font-size:18px;">
+              {{ reunionNombre() || 'Cargando...' }}
+            </div>
+          </div>
+
+          <h6>Todos los campos son obligatorios, excepto el correo.</h6>
+          <h6>En la sección "Proceso al que pertenece", únicamente el campo "Proceso" es obligatorio.</h6>
+
+          <div class="text-muted">
+            Código de reunión:
+            <span class="badge bg-secondary">{{ codigo() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ Pantalla de éxito -->
+      <div *ngIf="vista() === 'success'" class="alert alert-success">
+        <h5 class="mb-2" style="font-weight:800;">Registro realizado correctamente</h5>
+
+        <div class="mb-2">
+          <div class="text-muted">Reunión:</div>
+          <div style="font-weight:800;">
+            {{ reunionNombre() || '(sin nombre)' }}
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <span class="text-muted">Código:</span>
+          <span class="badge bg-secondary">{{ codigo() }}</span>
+        </div>
+
+        <div class="mt-2">{{ okMsg() }}</div>
+
+        <button type="button" class="btn btn-outline-primary btn-accion mt-3" (click)="volverAFormulario()">
+          Registrar otro asistente
+        </button>
+      </div>
+
+      <!-- ✅ Form -->
+      <div *ngIf="vista() === 'form'">
+
+        <div *ngIf="errorMsg()" class="alert alert-danger mb-3">
+          {{ errorMsg() }}
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+
+          <div class="mb-3">
+            <label class="form-label">Nombre completo</label>
+            <input class="form-control" formControlName="nombre_completo" (keypress)="soloLetras($event)" />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Identificación</label>
+            <input class="form-control" formControlName="identificacion" (keypress)="soloNumeros($event)" />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Correo (opcional)</label>
+            <div class="input-group">
+              <input
+                type="email"
+                class="form-control"
+                formControlName="correo"
+                placeholder="correo@dominio.com"
+              />
+            </div>
+            <div class="text-danger small" *ngIf="form.get('correo')?.touched && form.get('correo')?.invalid">
+              Ingresa un correo válido.
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Cargo</label>
+            <input class="form-control" formControlName="cargo" />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Modalidad de asistencia</label>
+            <select class="form-select" formControlName="modalidad_asistencia">
+              <option value="PRESENCIAL">Presencial</option>
+              <option value="VIRTUAL">Virtual</option>
+            </select>
+          </div>
+
+          <hr class="my-3" />
+
+          <h5 class="mb-3 titulo-seccion">Proceso al que pertenece</h5>
+
+          <div class="row g-3 mb-2">
+            <div class="col-md-4">
+              <label class="form-label" for="proceso_id">Proceso</label>
+              <select id="proceso_id" name="proceso_id" class="form-select" formControlName="proceso_id">
+                <option value="">Selecciona...</option>
+                <option *ngFor="let p of procesos()" [value]="p.id">
+                  {{ p.nombre_mostrado || p.nombre || p.codigo }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-12 mt-2" *ngIf="esProcesoExterno()">
+              <label class="form-label fw-semibold">
+                Ingresa la institución a la que perteneces
+              </label>
+              <input type="text" class="form-control" formControlName="institucion_externa" />
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Subproceso</label>
+              <select class="form-select" formControlName="subproceso_id" [disabled]="subprocesos().length === 0">
+                <option value="">
+                  {{
+                    !form.get('proceso_id')?.value
+                      ? 'Primero selecciona proceso'
+                      : (subprocesos().length === 0 ? 'No aplica' : 'Selecciona...')
+                  }}
+                </option>
+                <option *ngFor="let sp of subprocesos()" [value]="sp.id">
+                  {{ sp.nombre_mostrado || sp.nombre || sp.codigo }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Línea de trabajo</label>
+              <select class="form-select" formControlName="linea_trabajo_id" [disabled]="lineasTrabajo().length === 0">
+                <option value="">
+                  {{
+                    !form.get('subproceso_id')?.value
+                      ? 'Primero selecciona subproceso'
+                      : (lineasTrabajo().length === 0 ? 'No aplica' : 'Selecciona...')
+                  }}
+                </option>
+                <option *ngFor="let lt of lineasTrabajo()" [value]="lt.id">
+                  {{ lt.nombre_mostrado || lt.nombre || lt.codigo }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- ✅ Certificación SOLO para reuniones de DESPLIEGUE -->
+          <div
+            *ngIf="esReunionDespliegue()"
+            class="mt-4 p-3"
+            style="font-weight: 700; color: #000;"
+          >
+            Al continuar con el registro de información, certifico que conozco y comprendo
+            el/los documento/s mencionado/s y me comprometo a aplicarlo/s.
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-outline-primary btn-accion mt-3"
+            [disabled]="loading()"
+          >
+            {{ loading() ? 'Guardando...' : 'Registrar asistencia' }}
+          </button>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

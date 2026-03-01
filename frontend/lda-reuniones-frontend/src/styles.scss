@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap');
+
+body {
+  font-family: 'Nunito', sans-serif;
+}
+
+:root{
+  --am-navy: #083F73;
+  --am-teal: #00B7B0;
+  --am-teal-100: #E6F7F6;
+  --am-gray-700: #5A6B74;
+
+  --am-bg: #F7FAFC;
+  --am-card: #FFFFFF;
+  --am-border: rgba(8,63,115,.12);
+  --am-shadow: 0 10px 30px rgba(8,63,115,.10);
+  --am-radius: 16px;
+}
+
+html, body { height: 100%; }
+body{
+  background: var(--am-bg);
+  color: #0f172a;
+}
+
+/* espacio para navbar fija */
+.am-page{ padding-top: 76px; }
+.am-container{ max-width: 980px; }
+
+/* Navbar */
+.am-navbar{
+  background: rgba(255,255,255,.92);
+  border-bottom: 1px solid var(--am-border);
+  backdrop-filter: blur(10px);
+}
+.am-brand{
+  display:flex; align-items:center; gap:.75rem;
+}
+.am-brand img{ height: 34px; width:auto; }
+.am-brand-title strong{
+  display:block; color: var(--am-navy);
+  font-weight: 800; letter-spacing: .2px;
+}
+.am-brand-title small{ color: var(--am-gray-700); }
+
+/* Card pro */
+.am-card{
+  background: var(--am-card);
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius);
+  box-shadow: var(--am-shadow);
+}
+.am-card-header{
+  border-bottom: 1px solid var(--am-border);
+  padding: 18px 22px;
+  background: linear-gradient(180deg, rgba(0,183,176,.10), rgba(255,255,255,0));
+  border-top-left-radius: var(--am-radius);
+  border-top-right-radius: var(--am-radius);
+}
+.am-card-body{ padding: 22px; }
+
+.am-title{ color: var(--am-navy); font-weight: 800; margin: 0; }
+.am-subtitle{ color: var(--am-gray-700); margin: .35rem 0 0; }
+
+/* Botones */
+.btn-am-primary{
+  background: var(--am-teal);
+  border-color: var(--am-teal);
+  color: #fff;
+  font-weight: 700;
+  border-radius: 12px;
+  padding: .65rem 1rem;
+}
+.btn-am-primary:hover{ filter: brightness(.95); color:#fff; }
+
+.btn-am-outline{
+  border-color: rgba(8,63,115,.25);
+  color: var(--am-navy);
+  border-radius: 12px;
+  font-weight: 700;
+  padding: .65rem 1rem;
+}
+.btn-am-outline:hover{ background: rgba(8,63,115,.06); }
+
+/* Inputs */
+.form-control, .form-select, .input-group-text{
+  border-radius: 12px;
+  border-color: rgba(8,63,115,.18);
+}
+.form-control:focus, .form-select:focus{
+  border-color: rgba(0,183,176,.65);
+  box-shadow: 0 0 0 .2rem rgba(0,183,176,.18);
+}
+
+/* Alert estilo marca */
+.alert-am{
+  border-radius: 14px;
+  border: 1px solid rgba(0,183,176,.25);
+  background: rgba(0,183,176,.08);
+  color: var(--am-navy);
+}
+
+/* contenedor consistente */
+.am-container{ max-width: 980px; }
+
+/* tabs estilo AlmaMáter sin romper nav-pills */
+.am-pills .nav-link{
+  border-radius: 999px;
+  font-weight: 700;
+  color: var(--am-navy);
+  background: rgba(8,63,115,.06);
+  border: 1px solid rgba(8,63,115,.10);
+  padding: .45rem .85rem;
+}
+.am-pills .nav-link:hover{
+  background: rgba(8,63,115,.10);
+}
+.am-pills .nav-link.active{
+  background: var(--am-teal);
+  border-color: var(--am-teal);
+  color: #fff;
+}
+
+/* ajuste visual del header */
+.am-card-header img{
+  filter: drop-shadow(0 6px 12px rgba(8,63,115,.10));
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background-image:
+    /* Overlay MUY suave */
+
+    url("/brand/almamater-bg.png");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  min-height: 100%;
+}

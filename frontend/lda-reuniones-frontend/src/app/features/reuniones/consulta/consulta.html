@@ -1,0 +1,85 @@
+<h4 class="mb-0 am-title">Consultar reunión</h4>
+
+<div *ngIf="errorMsg()" class="alert alert-danger">
+  {{ errorMsg() }}
+</div>
+
+<form [formGroup]="form" (ngSubmit)="consultar()" class="row g-3 align-items-end">
+  <div class="col-md-8">
+    <label class="form-label">Código de reunión</label>
+    <input class="form-control" formControlName="codigo" placeholder="Ej: 20260105_362" />
+    <div class="text-danger small" *ngIf="form.get('codigo')?.touched && form.get('codigo')?.invalid">
+      Ingresa un código válido.
+    </div>
+  </div>
+
+  <div class="col-md-4 d-grid gap-2">
+    <button class="btn btn-am-primary" type="submit" [disabled]="loading() || form.invalid">
+      {{ loading() ? 'Consultando...' : 'Consultar' }}
+    </button>
+
+    <button class="btn btn-am-primary" type="button" (click)="descargarQr()" [disabled]="!data()">
+      Ver / Descargar QR
+    </button>
+  </div>
+</form>
+
+<hr class="my-4" />
+
+<div *ngIf="data() as r" class="table-responsive">
+  <table class="table table-sm">
+    <tbody>
+      <tr><th style="width: 240px;">Código</th><td>{{ r.codigo }}</td></tr>
+      <tr><th>Tipo documento</th><td>{{ r.tipo_documento }}</td></tr>
+      <tr><th>Nombre evento</th><td>{{ r.nombre_evento }}</td></tr>
+      <tr><th>Fecha</th><td>{{ r.fecha_evento }}</td></tr>
+      <tr><th>Hora</th><td>{{ r.hora_inicio }} - {{ r.hora_fin }}</td></tr>
+      <tr><th>Modalidad</th><td>{{ r.modalidad }}</td></tr>
+      <tr><th>Sede</th><td>{{ r.sede_nombre }}</td></tr>
+      <tr><th>Lugar</th><td>{{ r.lugar_texto }}</td></tr>
+      <tr><th>Anfitrión</th><td>{{ r.nombre_completo }} ({{ r.identificacion }})</td></tr>
+      <tr><th>Correo</th><td>{{ r.correo }}</td></tr>
+      <tr><th>Cargo</th><td>{{ r.cargo }}</td></tr>
+      <tr><th>Link registro</th><td><a [href]="r.link_registro" target="_blank">{{ r.link_registro }}</a></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr class="my-4" />
+
+<div class="d-flex align-items-center justify-content-between mb-2">
+  <h5 class="mb-0">Asistentes registrados</h5>
+  <span class="badge bg-dark">
+    Total: {{ asistentes().length }}
+  </span>
+</div>
+
+<div *ngIf="loadingAsistentes()" class="text-muted">
+  Cargando asistentes...
+</div>
+
+<div *ngIf="!loadingAsistentes() && asistentes().length === 0" class="text-muted">
+  No hay asistentes registrados.
+</div>
+
+<div class="table-responsive" *ngIf="!loadingAsistentes() && asistentes().length > 0">
+  <table class="table table-sm align-middle">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Registrado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let a of asistentes()">
+        <td>{{ a.nombre_completo }}</td>
+        <td class="text-muted">
+          {{ a.created_at | date:'yyyy-MM-dd HH:mm' }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+
